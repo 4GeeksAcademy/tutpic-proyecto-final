@@ -1,52 +1,97 @@
-import React, { useEffect } from "react"
-import rigoImageUrl from "../assets/img/rigo-baby.jpg";
+import React, { useEffect, useState } from "react";
+import logoImageUrl from "../assets/img/11.png";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export const Home = () => {
+  useEffect(() => {
+    document.title = "Home | Let's Cook!";
+  }, []);
+  const { store, dispatch } = useGlobalReducer();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-	const { store, dispatch } = useGlobalReducer()
+  const loadMessage = async () => {
+    try {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL;
+      if (!backendUrl) throw new Error("VITE_BACKEND_URL is not defined in .env file");
 
-	const loadMessage = async () => {
-		try {
-			const backendUrl = import.meta.env.VITE_BACKEND_URL
+      const response = await fetch(`${backendUrl}/api/hello`);
+      const data = await response.json();
 
-			if (!backendUrl) throw new Error("VITE_BACKEND_URL is not defined in .env file")
+      if (response.ok) {
+        dispatch({ type: "set_hello", payload: data.message });
+      } else {
+        setError("Failed to load message from backend.");
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-			const response = await fetch(backendUrl + "/api/hello")
-			const data = await response.json()
+  useEffect(() => {
+    loadMessage();
+  }, []);
 
-			if (response.ok) dispatch({ type: "set_hello", payload: data.message })
+  const token = localStorage.getItem("access_token");
 
-			return data
+  return (
+    <div className="home-container">
+      <div className="home-card">
+        <h1 className="home-title">Bienvenido a Let's Cook</h1>
 
-		} catch (error) {
-			if (error.message) throw new Error(
-				`Could not fetch the message from the backend.
-				Please check if the backend is running and the backend port is public.`
-			);
-		}
+        <img src={logoImageUrl} className="home-logo" alt="Let's Cook Logo" />
 
-	}
+        {location.state?.message && (
+          <div className="alert-custom alert-success-custom">
+            {location.state.message}
+          </div>
+        )}
 
-	useEffect(() => {
-		loadMessage()
-	}, [])
+        {error && (
+          <div className="alert-custom alert-error-custom">
+            {error}
+          </div>
+        )}
 
-	return (
-		<div className="text-center mt-5">
-			<h1 className="display-4">Hello Rigo!!</h1>
-			<p className="lead">
-				<img src={rigoImageUrl} className="img-fluid rounded-circle mb-3" alt="Rigo Baby" />
-			</p>
-			<div className="alert alert-info">
-				{store.message ? (
-					<span>{store.message}</span>
-				) : (
-					<span className="text-danger">
-						Loading message from the backend (make sure your python 🐍 backend is running)...
-					</span>
-				)}
-			</div>
-		</div>
-	);
-}; 
+        {!loading && store?.message && (
+          <p style={{ color: '#636e72', fontSize: '15px', marginTop: '16px' }}>
+            {store.message}
+          </p>
+        )}
+
+        <div className="home-buttons">
+          {!token ? (
+            <>
+              <button
+                className="btn-orange-primary"
+                onClick={() => navigate("/register")}
+              >
+                Crear Cuenta
+              </button>
+              <button
+                className="btn-orange-secondary"
+                onClick={() => navigate("/login")}
+              >
+                Iniciar Sesión
+              </button>
+            </>
+          ) : (
+            <button
+              className="btn-orange-primary"
+              onClick={() => navigate("/dashboard")}
+            >
+              Ir al Dashboard
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Home;

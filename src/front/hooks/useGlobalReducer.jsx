@@ -1,23 +1,23 @@
-// Import necessary hooks and functions from React.
+// Importar hooks y funciones necesarias de React.
 import { useContext, useReducer, createContext } from "react";
-import storeReducer, { initialStore } from "../store"  // Import the reducer and the initial state.
+import storeReducer, { initialStore } from "../store"  // Importar el reducer y el estado inicial.
 
-// Create a context to hold the global state of the application
-// We will call this global state the "store" to avoid confusion while using local states
+// Crear un contexto para mantener el estado global de la aplicación
+// Llamaremos a este estado global "store" para evitar confusión al usar estados locales
 const StoreContext = createContext()
 
-// Define a provider component that encapsulates the store and warps it in a context provider to 
-// broadcast the information throught all the app pages and components.
+// Definir un componente proveedor que encapsula el store y lo envuelve en un context provider para
+// transmitir la información a través de todas las páginas y componentes de la app.
 export function StoreProvider({ children }) {
-    // Initialize reducer with the initial state.
+    // Inicializar el reducer con el estado inicial.
     const [store, dispatch] = useReducer(storeReducer, initialStore())
-    // Provide the store and dispatch method to all child components.
+    // Proporcionar el store y el método dispatch a todos los componentes hijos.
     return <StoreContext.Provider value={{ store, dispatch }}>
         {children}
     </StoreContext.Provider>
 }
 
-// Custom hook to access the global state and dispatch function.
+// Hook personalizado para acceder al estado global y la función dispatch.
 export default function useGlobalReducer() {
     const { dispatch, store } = useContext(StoreContext)
     return { dispatch, store };

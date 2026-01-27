@@ -1,33 +1,39 @@
 
 import click
 from api.models import db, User
+from flask_bcrypt import Bcrypt
+
+bcrypt = Bcrypt()
 
 """
-In this file, you can add as many commands as you want using the @app.cli.command decorator
-Flask commands are usefull to run cronjobs or tasks outside of the API but sill in integration 
-with youy database, for example: Import the price of bitcoin every night as 12am
+En este archivo, puedes agregar tantos comandos como quieras usando el decorador @app.cli.command
+Los comandos de Flask son útiles para ejecutar cronjobs o tareas fuera del API pero manteniendo la integración
+con tu base de datos, por ejemplo: Importar el precio del bitcoin cada noche a las 12am
 """
 def setup_commands(app):
-    
-    """ 
-    This is an example command "insert-test-users" that you can run from the command line
-    by typing: $ flask insert-test-users 5
-    Note: 5 is the number of users to add
+
     """
-    @app.cli.command("insert-test-users") # name of our command
-    @click.argument("count") # argument of out command
+    Este es un comando de ejemplo "insert-test-users" que puedes ejecutar desde la línea de comandos
+    escribiendo: $ flask insert-test-users 5
+    Nota: 5 es el número de usuarios a agregar
+    """
+    @app.cli.command("insert-test-users") # nombre de nuestro comando
+    @click.argument("count") # argumento de nuestro comando
     def insert_test_users(count):
-        print("Creating test users")
+        print("Creando usuarios de prueba")
         for x in range(1, int(count) + 1):
             user = User()
+            user.username = "test_user" + str(x)
             user.email = "test_user" + str(x) + "@test.com"
-            user.password = "123456"
+            user.password = bcrypt.generate_password_hash("123456").decode('utf-8')
             user.is_active = True
+            user.is_admin = False
+            user.is_premium = False
             db.session.add(user)
             db.session.commit()
-            print("User: ", user.email, " created.")
+            print("Usuario: ", user.email, " creado.")
 
-        print("All test users created")
+        print("Todos los usuarios de prueba fueron creados")
 
     @app.cli.command("insert-test-data")
     def insert_test_data():

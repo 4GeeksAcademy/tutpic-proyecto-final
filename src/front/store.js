@@ -4,12 +4,12 @@ export const initialStore=()=>{
     todos: [
       {
         id: 1,
-        title: "Make the bed",
+        title: "Tender la cama",
         background: null,
       },
       {
         id: 2,
-        title: "Do my homework",
+        title: "Hacer mi tarea",
         background: null,
       }
     ]
@@ -23,7 +23,7 @@ export default function storeReducer(store, action = {}) {
         ...store,
         message: action.payload
       };
-      
+
     case 'add_task':
 
       const { id,  color } = action.payload
@@ -33,6 +33,6 @@ export default function storeReducer(store, action = {}) {
         todos: store.todos.map((todo) => (todo.id === id ? { ...todo, background: color } : todo))
       };
     default:
-      throw Error('Unknown action.');
-  }    
+      throw Error('Acción desconocida.');
+  }
 }

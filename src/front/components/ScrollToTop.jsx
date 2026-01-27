@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
-// This component allows the scroll to go to the beginning when changing the view,
-// otherwise it would remain in the position of the previous view. 
-// Investigate more about this React behavior :D 
+// Este componente permite que el scroll vaya al inicio al cambiar de vista,
+// de lo contrario permanecería en la posición de la vista anterior.
+// Investiga más sobre este comportamiento de React :D
 
 const ScrollToTop = ({ location, children }) => {
     const prevLocation = useRef(location);
